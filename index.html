@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新生資訊網 - 人文傳播暨社會科學院</title>
+    
+    <!-- 啟用 Google Analytics 追蹤 (請替換為實際追蹤碼) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 marked.js 解析 Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#14b8a6', // Teal 500
+                        secondary: '#0f766e', // Teal 700
+                        accent: '#f59e0b', // Amber 500
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 自訂漸變背景與平滑過渡特效 */
+        body {
+            background-color: #f8fafc;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .faq-answer.open {
+            max-height: 200px; /* 預設展開高度 */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        .faq-btn[aria-expanded="true"] .faq-icon {
+            transform: rotate(180deg);
+        }
+        /* 搜尋高亮 */
+        .highlight {
+            background-color: #fde68a;
+            color: #92400e;
+            padding: 0 0.125rem;
+            border-radius: 0.125rem;
+        }
+
+        /* TCU Copilot Chat UI */
+        #chat-widget {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #chat-widget.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .chat-message {
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+            height: 6px;
+            width: 6px;
+            background: #0f766e;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 1px;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+        /* Markdown 渲染樣式美化 */
+        .markdown-content ul { list-style-type: disc; padding-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .markdown-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .markdown-content li { margin-bottom: 0.25rem; }
+        .markdown-content p { margin-bottom: 0.75rem; }
+        .markdown-content p:last-child { margin-bottom: 0; }
+        .markdown-content strong { color: #b45309; font-weight: 700; }
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 { font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #92400e; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased font-sans">
+
+    <!-- 頂部導航 -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <span class="font-bold text-xl text-secondary tracking-wide">新生資訊站</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#search-section" class="text-gray-600 hover:text-primary transition-colors font-medium">資料檢索</a>
+                    <a href="#resource-library" class="text-gray-600 hover:text-primary transition-colors font-medium">資源圖書館</a>
+                    <a href="#faq-section" class="text-gray-600 hover:text-primary transition-colors font-medium">常見問題</a>
+                    <!-- 管理員入口按鈕 -->
+                    <button onclick="toggleAdminModal()" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md font-medium transition-colors flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        管理員
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄區塊 (Hero Section) -->
+    <header class="hero-bg text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <h2 class="text-sm font-semibold tracking-wider text-teal-100 uppercase mb-2">College of Humanities, Communication and Social Sciences</h2>
+            <h1 class="text-4xl sm:text-5xl font-extrabold mb-6 leading-tight drop-shadow-md">
+                歡迎光臨<br>人文傳播暨社會科學院
+            </h1>
+            <p class="text-xl sm:text-2xl font-light mb-8 text-teal-50">
+                「在變動的時代給你一個 <span class="font-bold text-white border-b-4 border-accent pb-1">不被取代</span> 的未來」
+            </p>
+            <div class="inline-block bg-white/20 backdrop-blur-md px-6 py-3 rounded-full text-sm sm:text-base font-medium shadow-lg border border-white/30">
+                🌱 立基人文底蘊 🚀 展翼智慧未來
+            </div>
+        </div>
+        <!-- 裝飾背景 -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-10 pointer-events-none">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute w-full h-full"><polygon fill="white" points="0,100 100,0 100,100"/></svg>
+        </div>
+    </header>
+
+    <!-- 搜尋區塊 -->
+    <section id="search-section" class="max-w-4xl mx-auto px-4 -mt-8 relative z-20">
+        <div class="bg-white rounded-xl shadow-xl p-6 border border-gray-100 flex flex-col sm:flex-row items-center gap-4 focus-within:ring-2 focus-within:ring-primary transition-shadow">
+            <div class="flex-1 flex items-center w-full">
+                <svg class="w-6 h-6 text-gray-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="searchInput" placeholder="搜尋學系、中心、規定或任何您想了解的資訊..." class="w-full text-lg outline-none text-gray-700 placeholder-gray-400 bg-transparent">
+            </div>
+            <button onclick="searchWithGoogle()" class="w-full sm:w-auto px-5 py-2.5 bg-[#4285F4] hover:bg-[#3367D6] text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 whitespace-nowrap shadow-sm">
+                <svg class="w-5 h-5 bg-white rounded-full p-0.5" viewBox="0 0 24 24" fill="#4285F4"><path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/></svg>
+                Google 延伸搜尋
+            </button>
+        </div>
+        <p class="text-sm text-gray-500 mt-3 text-center" id="searchCount">請輸入關鍵字，為您從學院資料中檢索。</p>
+    </section>
+
+    <!-- 資源圖書館 (Resource Library) -->
+    <section id="resource-library" class="max-w-7xl mx-auto px-4 py-16">
+        <div class="mb-12 text-center">
+            <h2 class="text-3xl font-bold text-secondary mb-3">📚 學院資源圖書館</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto mb-6">為新生整理的學院教學單位與資源中心大全，點擊了解更多。</p>
+            
+            <!-- 新增：Gemini AI 職涯導航按鈕 -->
+            <button onclick="toggleAiNavModal()" class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+                ✨ 啟動 AI 專屬學習地圖導航
+            </button>
+        </div>
+        
+        <div id="resourcesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- 資源卡片將透過 JavaScript 動態生成 -->
+        </div>
+    </section>
+
+    <!-- 互動式 FAQ (Interactive FAQ) -->
+    <section id="faq-section" class="bg-teal-50 py-16">
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-secondary mb-3">💡 新生常見問題 (FAQ)</h2>
+                <p class="text-gray-600">整理自學院最新資訊，協助您快速熟悉環境。</p>
+            </div>
+            
+            <div id="faqContainer" class="space-y-4">
+                <!-- FAQ 項目將透過 JavaScript 動態生成 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 (Footer) -->
+    <footer class="bg-gray-800 text-gray-300 py-12">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    聯絡我們
+                </h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-3 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <div class="w-full">
+                            <span class="block mb-2">地址：970花蓮縣花蓮市介仁街67號</span>
+                            <!-- 互動式 Google 導航地圖 -->
+                            <iframe src="https://maps.google.com/maps?q=970花蓮縣花蓮市介仁街67號&t=&z=15&ie=UTF8&iwloc=&output=embed" class="w-full h-40 rounded-lg border-0 shadow-sm opacity-90 hover:opacity-100 transition-opacity bg-gray-700" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 mr-3 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <span>Email：yuan@gms.tcu.edu.tw</span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-white mb-4">快速連結</h3>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <a href="#" class="hover:text-primary transition-colors">慈大首頁</a>
+                    <a href="#" class="hover:text-primary transition-colors">最新消息 (院務公告, 師生榮譽)</a>
+                    <a href="#" class="hover:text-primary transition-colors">關於本院 (簡介, 核心能力)</a>
+                    <a href="#" class="hover:text-primary transition-colors">法令規章 (教師相關, 委員會)</a>
+                    <a href="#" class="hover:text-primary transition-colors">教/研交流活動 (國際/海外/在地)</a>
+                    <a href="#" class="hover:text-primary transition-colors">招生專區 (大學部, 研究所)</a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 mt-8 pt-8 border-t border-gray-700 text-sm text-center text-gray-500">
+            &copy; 慈濟大學 人文傳播暨社會科學院. All rights reserved. 
+        </div>
+    </footer>
+
+    <!-- TCU Copilot (Gemini AI) 浮動小工具 -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <!-- 聊天視窗 -->
+        <div id="chat-widget" class="bg-white w-80 sm:w-96 rounded-2xl shadow-2xl border border-gray-200 mb-4 flex flex-col overflow-hidden hidden" style="height: 500px; max-height: 70vh;">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-teal-600 to-teal-500 text-white p-4 flex justify-between items-center shadow-md z-10">
+                <div class="flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <span class="font-bold">TCU Copilot</span>
+                </div>
+                <button onclick="toggleChat()" class="text-white hover:text-teal-200 transition-colors focus:outline-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- 訊息區域 -->
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col gap-3">
+                <!-- 歡迎訊息 -->
+                <div class="flex flex-col items-start chat-message">
+                    <div class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm max-w-[85%] text-sm leading-relaxed">
+                        您好！我是 TCU Copilot 學院專屬 AI 助理 👋<br>關於學院的科系、資源或聯絡方式，有什麼我可以幫忙您的嗎？
+                    </div>
+                </div>
+            </div>
+
+            <!-- 輸入區域 -->
+            <div class="p-3 bg-white border-t border-gray-100 flex gap-2 items-center">
+                <input type="text" id="chat-input" placeholder="輸入您的問題..." class="flex-1 bg-gray-100 text-gray-700 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm transition-shadow" onkeypress="handleChatKeyPress(event)">
+                <button onclick="sendChatMessage()" class="bg-teal-600 hover:bg-teal-700 text-white rounded-full p-2.5 transition-colors focus:outline-none flex-shrink-0">
+                    <svg class="w-4 h-4 transform rotate-90" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 浮動按鈕 -->
+        <button onclick="toggleChat()" class="bg-teal-600 hover:bg-teal-700 text-white rounded-full p-4 shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 focus:outline-none flex items-center justify-center relative group">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            <!-- 提示點 -->
+            <span class="absolute top-0 right-0 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-accent border-2 border-teal-600"></span>
+            </span>
+        </button>
+    </div>
+
+    <!-- ✨ AI 專屬學習地圖導航 Modal -->
+    <div id="ai-nav-modal" class="fixed inset-0 bg-gray-900/60 z-[100] hidden items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 transform transition-all scale-95 flex flex-col max-h-[90vh]" id="ai-nav-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <span class="text-2xl">✨</span> AI 學習地圖導航
+                </h3>
+                <button onclick="toggleAiNavModal()" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-1.5 transition-colors focus:outline-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-600 text-sm mb-3">請告訴我你的興趣、專長或未來夢想的職業，AI 會為您從學院資源圖書館中推薦最適合您的系所、中心或學習工具！</p>
+                <div class="flex gap-2">
+                    <input type="text" id="ai-nav-input" placeholder="例如：我想當記者、喜歡寫程式、想幫助弱勢族群..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow disabled:bg-gray-100 disabled:cursor-not-allowed">
+                    <button id="ai-nav-btn" onclick="generateAiLearningMap()" class="bg-amber-500 hover:bg-amber-600 disabled:bg-amber-400 disabled:cursor-not-allowed text-white font-bold py-2 px-5 rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap">
+                        <span id="ai-nav-btn-text">開始導航</span>
+                        <svg id="ai-nav-spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <!-- 結果顯示區塊 -->
+            <div id="ai-nav-result" class="hidden overflow-y-auto flex-1 mt-2 scrollbar-thin scrollbar-thumb-gray-300">
+                <!-- AI 回應將顯示於此 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理員控制台 Modal (Admin Control) -->
+    <div id="admin-modal" class="fixed inset-0 bg-gray-900/60 z-[100] hidden items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-95" id="admin-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    管理員控制台
+                </h3>
+                <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-1.5 transition-colors focus:outline-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- 登入視圖 -->
+            <div id="admin-login-view">
+                <p class="text-sm text-gray-500 mb-4">請輸入授權的管理員帳號與密碼以進入後台。(測試請隨意輸入並點擊登入)</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">管理員帳號</label>
+                        <input type="text" id="admin-user" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow" placeholder="admin">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
+                        <input type="password" id="admin-pass" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow" placeholder="••••••••">
+                    </div>
+                    <button onclick="handleAdminLogin()" class="w-full bg-primary hover:bg-secondary text-white font-bold py-2.5 rounded-lg transition-colors mt-2 shadow-sm">
+                        安全登入
+                    </button>
+                </div>
+            </div>
+
+            <!-- 後台儀表板視圖 (預設隱藏) -->
+            <div id="admin-dashboard-view" class="hidden">
+                <div class="bg-teal-50 border border-teal-200 text-teal-700 p-3 rounded-lg mb-5 text-sm font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    登入成功！歡迎進入 TCU 新生網管理後台。
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-white hover:shadow-md hover:border-primary group flex flex-col items-center justify-center gap-2 transition-all">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">📝</span>
+                        <span class="text-sm font-medium text-gray-700 group-hover:text-primary">編輯資源庫</span>
+                    </button>
+                    <button class="p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-white hover:shadow-md hover:border-primary group flex flex-col items-center justify-center gap-2 transition-all">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">❓</span>
+                        <span class="text-sm font-medium text-gray-700 group-hover:text-primary">管理 FAQ</span>
+                    </button>
+                    <button class="p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-white hover:shadow-md hover:border-primary group flex flex-col items-center justify-center gap-2 transition-all">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">📣</span>
+                        <span class="text-sm font-medium text-gray-700 group-hover:text-primary">推播公告</span>
+                    </button>
+                    <button class="p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-white hover:shadow-md hover:border-primary group flex flex-col items-center justify-center gap-2 transition-all">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">📊</span>
+                        <span class="text-sm font-medium text-gray-700 group-hover:text-primary">流量分析</span>
+                    </button>
+                </div>
+                
+                <button onclick="handleAdminLogout()" class="w-full mt-6 py-2.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm font-bold flex justify-center items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    登出系統
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 邏輯區 -->
+    <script>
+        // 知識庫資料 (擷取自提供之文件)
+        const collegeData = {
+            resources: [
+                {
+                    title: "官方資訊與入口網站",
+                    icon: "🏛️",
+                    color: "bg-amber-50 border-amber-200 text-amber-800",
+                    items: [
+                        { name: "慈濟大學 (TCU) 官方網站", url: "https://www.tcu.edu.tw/" },
+                        { name: "人文傳播暨社會科學院 官網", url: "https://chcss.tcu.edu.tw/" },
+                        { name: "校園入口網 (iTCU)", url: "#" }
+                    ]
+                },
+                {
+                    title: "學系與學程 (含碩士班)",
+                    icon: "🎓",
+                    color: "bg-blue-50 border-blue-200 text-blue-800",
+                    items: [
+                        "社會工作學系(含碩士班)",
+                        "兒童發展與家庭教育學系",
+                        "人類發展與心理學系(含碩士班)",
+                        "外語暨新興科技應用學系",
+                        "東方語文學系(含碩士班)",
+                        "傳播學系(含碩士班)",
+                        "國際數位媒體科技學士學位學程"
+                    ]
+                },
+                {
+                    title: "獨立研究所",
+                    icon: "🔬",
+                    color: "bg-purple-50 border-purple-200 text-purple-800",
+                    items: [
+                        "教育研究所",
+                        "宗教與人文研究所"
+                    ]
+                },
+                {
+                    title: "中心與實習電台",
+                    icon: "📡",
+                    color: "bg-emerald-50 border-emerald-200 text-emerald-800",
+                    items: [
+                        "外語教學中心",
+                        "華語中心",
+                        "師資培育中心",
+                        "媒體製作暨教學中心",
+                        "慈濟學教學研究中心",
+                        "實習廣播電臺"
+                    ]
+                },
+                {
+                    title: "開發與數位學習工具",
+                    icon: "💻",
+                    color: "bg-indigo-50 border-indigo-200 text-indigo-800",
+                    items: [
+                        { name: "Visual Studio Code Online (網頁版編輯器)", url: "https://vscode.dev" },
+                        { name: "Online Python Compiler (線上 Python 執行環境)", url: "https://www.programiz.com/python-programming/online-compiler/" },
+                        { name: "Replit (雲端程式碼編輯與協作平台)", url: "https://replit.com/" },
+                        { name: "Online SQL Editor (線上 SQL 資料庫練習環境)", url: "https://sqliteonline.com/" },
+                        { name: "TronClass 數位學習平台", url: "#" },
+                        { name: "Google Workspace 學生雲端", url: "#" }
+                    ]
+                },
+                {
+                    title: "學生自治與活動",
+                    icon: "🏃‍♂️",
+                    color: "bg-rose-50 border-rose-200 text-rose-800",
+                    items: [
+                        { name: "人文傳播暨社會科學院 院學會", url: "#" },
+                        { name: "各系系學會專區", url: "#" },
+                        { name: "學生社團總覽 (社團評鑑與招募)", url: "#" },
+                        { name: "校園活動報名系統", url: "#" },
+                        { name: "學生服務學習時數查詢", url: "#" }
+                    ]
+                }
+            ],
+            faqs: [
+                {
+                    q: "人文傳播暨社會科學院的核心願景與精神是什麼？",
+                    a: "學院期許「在變動的時代給你一個『不被取代』的未來」，並以「立基人文底蘊 展翼智慧未來」作為發展基石，重視人文與智慧科技的結合。"
+                },
+                {
+                    q: "學院底下有哪些大學部的學系可以就讀？",
+                    a: "我們擁有豐富的系所，包含：社會工作學系、兒童發展與家庭教育學系、人類發展與心理學系、外語暨新興科技應用學系、東方語文學系、傳播學系，以及國際數位媒體科技學士學位學程。"
+                },
+                {
+                    q: "學院除了學系之外，有提供哪些實務中心資源嗎？",
+                    a: "有的，學院設有多個中心供學生學習與實作，包含：外語教學中心、華語中心、師資培育中心、媒體製作暨教學中心、慈濟學教學研究中心，以及實習廣播電臺。"
+                },
+                {
+                    q: "如果想詢問學院事務，要怎麼聯絡？",
+                    a: "學院地址位於：970花蓮縣花蓮市介仁街67號。您可以撥打電話 (03) 8565301，或發送 Email 至 yuan@gms.tcu.edu.tw 與我們聯繫。"
+                },
+                {
+                    q: "學院有哪些重點的交流活動規劃？",
+                    a: "學院致力於推動「國際交流/合作」、「海外交流」以及「在地實踐」等教研交流活動，幫助學生拓展視野。"
+                }
+            ]
+        };
+
+        // DOM 元素
+        const resourcesContainer = document.getElementById('resourcesContainer');
+        const faqContainer = document.getElementById('faqContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchCount = document.getElementById('searchCount');
+
+        // 輔助函式：文字高亮標記
+        function highlightText(text, term) {
+            if (!term) return text;
+            const regex = new RegExp(`(${term})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // 渲染資源圖書館
+        function renderResources(searchTerm = '') {
+            resourcesContainer.innerHTML = '';
+            let matchCount = 0;
+
+            collegeData.resources.forEach(category => {
+                // 過濾符合搜尋字詞的項目
+                const filteredItems = category.items.filter(item => {
+                    const itemName = typeof item === 'string' ? item : item.name;
+                    return itemName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           category.title.toLowerCase().includes(searchTerm.toLowerCase());
+                });
+
+                if (filteredItems.length > 0) {
+                    matchCount += filteredItems.length;
+                    
+                    const card = document.createElement('div');
+                    card.className = `rounded-xl border shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden ${category.color.split(' ')[0]} ${category.color.split(' ')[1]}`;
+                    
+                    let itemsHtml = filteredItems.map(item => {
+                        const itemName = typeof item === 'string' ? item : item.name;
+                        const itemUrl = typeof item === 'string' ? null : item.url;
+                        
+                        // 若有 URL 則渲染為超連結樣式
+                        const itemContent = itemUrl 
+                            ? `<a href="${itemUrl}" target="_blank" class="hover:underline flex items-center gap-1.5">${highlightText(itemName, searchTerm)} <svg class="w-3.5 h-3.5 opacity-60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>`
+                            : highlightText(itemName, searchTerm);
+
+                        return `
+                        <li class="flex items-start py-2 border-b border-white/40 last:border-0">
+                            <svg class="w-4 h-4 mt-1 mr-2 opacity-70 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="font-medium ${category.color.split(' ')[2]} w-full">${itemContent}</span>
+                        </li>
+                    `}).join('');
+
+                    card.innerHTML = `
+                        <div class="p-5 border-b border-white/50 bg-white/40 flex items-center gap-3">
+                            <span class="text-3xl">${category.icon}</span>
+                            <h3 class="text-xl font-bold ${category.color.split(' ')[2]}">${highlightText(category.title, searchTerm)}</h3>
+                        </div>
+                        <div class="p-5 bg-white/20">
+                            <ul class="space-y-1">
+                                ${itemsHtml}
+                            </ul>
+                        </div>
+                    `;
+                    resourcesContainer.appendChild(card);
+                }
+            });
+
+            if (resourcesContainer.innerHTML === '') {
+                resourcesContainer.innerHTML = `
+                    <div class="col-span-full text-center py-10 text-gray-500">
+                        <span class="text-4xl block mb-2">🔍</span>
+                        找不到與「${searchTerm}」相關的教學單位或資源。
+                    </div>
+                `;
+            }
+            return matchCount;
+        }
+
+        // 渲染常見問題 FAQ
+        function renderFAQs(searchTerm = '') {
+            faqContainer.innerHTML = '';
+            let matchCount = 0;
+
+            collegeData.faqs.forEach((faq, index) => {
+                const matchesSearch = faq.q.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                      faq.a.toLowerCase().includes(searchTerm.toLowerCase());
+
+                if (matchesSearch) {
+                    matchCount++;
+                    const faqItem = document.createElement('div');
+                    faqItem.className = 'bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all';
+                    
+                    const isExpanded = searchTerm !== '' ? true : false;
+
+                    faqItem.innerHTML = `
+                        <button class="faq-btn w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-gray-50" aria-expanded="${isExpanded}" onclick="toggleFaq(this)">
+                            <span class="font-bold text-lg text-secondary pr-4">${highlightText(faq.q, searchTerm)}</span>
+                            <svg class="faq-icon w-6 h-6 text-primary shrink-0 transform ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer px-6 bg-gray-50 text-gray-700 leading-relaxed ${isExpanded ? 'open' : ''}">
+                            <p>${highlightText(faq.a, searchTerm)}</p>
+                        </div>
+                    `;
+                    faqContainer.appendChild(faqItem);
+                }
+            });
+
+            if (faqContainer.innerHTML === '') {
+                faqContainer.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        目前沒有與「${searchTerm}」相關的常見問題。
+                    </div>
+                `;
+            }
+            return matchCount;
+        }
+
+        // FAQ 展開/收起切換邏輯
+        window.toggleFaq = function(button) {
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', !isExpanded);
+            
+            const answer = button.nextElementSibling;
+            const icon = button.querySelector('.faq-icon');
+            
+            if (!isExpanded) {
+                answer.classList.add('open');
+            } else {
+                answer.classList.remove('open');
+            }
+        };
+
+        // 搜尋監聽器
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim();
+            const resCount = renderResources(term);
+            const faqCount = renderFAQs(term);
+            
+            if (term) {
+                searchCount.textContent = `為您找到 ${resCount} 筆相關資源，與 ${faqCount} 則相關問答。`;
+                searchCount.classList.add('text-primary');
+            } else {
+                searchCount.textContent = '請輸入關鍵字，為您從學院資料中檢索。';
+                searchCount.classList.remove('text-primary');
+            }
+        });
+
+        // Google 延伸搜尋功能
+        window.searchWithGoogle = function() {
+            const term = searchInput.value.trim();
+            const query = term ? term + " 慈濟大學 人文傳播暨社會科學院" : "慈濟大學 人文傳播暨社會科學院";
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        };
+
+        // 管理員控制台 (Admin Control) 邏輯
+        const adminModal = document.getElementById('admin-modal');
+        const adminModalContent = document.getElementById('admin-modal-content');
+        const adminLoginView = document.getElementById('admin-login-view');
+        const adminDashboardView = document.getElementById('admin-dashboard-view');
+        const adminUser = document.getElementById('admin-user');
+        const adminPass = document.getElementById('admin-pass');
+
+        window.toggleAdminModal = function() {
+            if (adminModal.classList.contains('hidden')) {
+                adminModal.classList.remove('hidden');
+                adminModal.classList.add('flex');
+                setTimeout(() => {
+                    adminModal.classList.remove('opacity-0');
+                    adminModalContent.classList.remove('scale-95');
+                    adminUser.focus();
+                }, 10);
+            } else {
+                adminModal.classList.add('opacity-0');
+                adminModalContent.classList.add('scale-95');
+                setTimeout(() => {
+                    adminModal.classList.add('hidden');
+                    adminModal.classList.remove('flex');
+                }, 300);
+            }
+        };
+
+        window.handleAdminLogin = function() {
+            // 這裡可以加入真實的 API 驗證邏輯，目前為模擬成功
+            adminUser.value = '';
+            adminPass.value = '';
+            adminLoginView.classList.add('hidden');
+            adminDashboardView.classList.remove('hidden');
+        };
+
+        window.handleAdminLogout = function() {
+            adminDashboardView.classList.add('hidden');
+            adminLoginView.classList.remove('hidden');
+            toggleAdminModal();
+        };
+
+        // 點擊 Modal 外部區域關閉
+        adminModal.addEventListener('mousedown', (e) => {
+            if (e.target === adminModal) {
+                toggleAdminModal();
+            }
+        });
+
+        // TCU Copilot (Gemini API) 邏輯
+        const chatWidget = document.getElementById('chat-widget');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        let isChatOpen = false;
+
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            if (isChatOpen) {
+                chatWidget.classList.remove('hidden');
+                // 小延遲以確保 display:block 生效後再觸發 CSS 動畫
+                setTimeout(() => {
+                    chatWidget.classList.add('active');
+                    chatInput.focus();
+                }, 10);
+            } else {
+                chatWidget.classList.remove('active');
+                setTimeout(() => chatWidget.classList.add('hidden'), 300);
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(role, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex flex-col chat-message ${role === 'user' ? 'items-end' : 'items-start'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = `px-4 py-2.5 rounded-2xl shadow-sm max-w-[85%] text-sm leading-relaxed ${
+                role === 'user' 
+                ? 'bg-teal-600 text-white rounded-tr-sm' 
+                : 'bg-white border border-gray-200 text-gray-700 rounded-tl-sm markdown-content'
+            }`;
+            
+            // 使用 marked 解析 AI 的 Markdown 格式回應，若是使用者訊息則直接跳脫顯示
+            bubble.innerHTML = role === 'user' ? text.replace(/\n/g, '<br>') : marked.parse(text);
+            msgDiv.appendChild(bubble);
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const msgDiv = document.createElement('div');
+            msgDiv.id = 'typing-indicator';
+            msgDiv.className = 'flex flex-col items-start chat-message';
+            msgDiv.innerHTML = `
+                <div class="bg-white border border-gray-200 px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm typing-indicator flex items-center">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        async function sendChatMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            chatInput.value = '';
+            showTypingIndicator();
+
+            try {
+                const responseText = await callGeminiAPI(text);
+                removeTypingIndicator();
+                appendMessage('bot', responseText);
+            } catch (error) {
+                removeTypingIndicator();
+                appendMessage('bot', "抱歉，系統目前連線不穩定，請稍後再試。");
+                console.error("Gemini API Error:", error);
+            }
+        }
+
+        async function callGeminiAPI(userQuery, customSystemPrompt = null) {
+            const apiKey = ""; // 系統環境將自動帶入 API Key
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const defaultPrompt = "你是慈濟大學人文傳播暨社會科學院的專屬 AI 助理 (TCU Copilot)。請根據學院的資訊回答新生關於系所、資源與環境的問題，語氣要親切友善。若遇到不知道的問題，請引導他們使用網頁上方搜尋功能，或致電院辦(03-8565301)。請用繁體中文回答。";
+            const systemPrompt = customSystemPrompt || defaultPrompt;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            let attempt = 0;
+
+            while (attempt <= delays.length) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "抱歉，我目前無法產生回應。";
+                } catch (error) {
+                    if (attempt < delays.length) {
+                        await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+                        attempt++;
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        // ✨ AI 專屬學習地圖導航邏輯
+        const aiNavModal = document.getElementById('ai-nav-modal');
+        const aiNavModalContent = document.getElementById('ai-nav-modal-content');
+        const aiNavInput = document.getElementById('ai-nav-input');
+        const aiNavBtn = document.getElementById('ai-nav-btn'); // 新增選取按鈕
+        const aiNavResult = document.getElementById('ai-nav-result');
+        const aiNavBtnText = document.getElementById('ai-nav-btn-text');
+        const aiNavSpinner = document.getElementById('ai-nav-spinner');
+
+        window.toggleAiNavModal = function() {
+            if (aiNavModal.classList.contains('hidden')) {
+                aiNavModal.classList.remove('hidden');
+                aiNavModal.classList.add('flex');
+                setTimeout(() => {
+                    aiNavModal.classList.remove('opacity-0');
+                    aiNavModalContent.classList.remove('scale-95');
+                    aiNavInput.focus();
+                }, 10);
+            } else {
+                aiNavModal.classList.add('opacity-0');
+                aiNavModalContent.classList.add('scale-95');
+                setTimeout(() => {
+                    aiNavModal.classList.add('hidden');
+                    aiNavModal.classList.remove('flex');
+                    aiNavResult.innerHTML = '';
+                    aiNavResult.classList.add('hidden');
+                    aiNavInput.value = '';
+                }, 300);
+            }
+        };
+
+        window.generateAiLearningMap = async function() {
+            const interest = aiNavInput.value.trim();
+            if (!interest) return;
+
+            // 切換為載入狀態，並禁用輸入框與按鈕防連點
+            aiNavInput.disabled = true;
+            aiNavBtn.disabled = true;
+            aiNavBtnText.classList.add('hidden');
+            aiNavSpinner.classList.remove('hidden');
+            aiNavResult.innerHTML = '<div class="text-center text-amber-600 font-medium py-10 animate-pulse flex flex-col items-center gap-3"><span class="text-4xl">✨</span> 正在分析學院資源庫，為您量身打造專屬建議...</div>';
+            aiNavResult.classList.remove('hidden');
+
+            // 準備傳送給 Gemini 的學院資源 Context (知識庫 Grounding)
+            const resourceContext = collegeData.resources.map(c => {
+                const itemsStr = c.items.map(i => typeof i === 'string' ? i : i.name).join(', ');
+                return `【${c.title}】: ${itemsStr}`;
+            }).join('\n');
+
+            const systemPrompt = "你是 TCU 學院的生涯導航 AI。請根據提供的學院資源列表，為學生的興趣或夢想推薦最適合的 3 個系所或資源。請用溫暖鼓勵的語氣，並使用 markdown 條列式加上適當的 Emoji 來排版。";
+            const userQuery = `學生的興趣/夢想：「${interest}」\n\n可用的學院資源如下：\n${resourceContext}`;
+
+            try {
+                // 呼叫我們擴充後的 Gemini API 函數，傳入自訂 Prompt
+                const resultText = await callGeminiAPI(userQuery, systemPrompt);
+                
+                // 使用 marked.js 完美解析 Markdown 排版
+                const formattedText = marked.parse(resultText);
+
+                aiNavResult.innerHTML = `<div class="bg-amber-50 border border-amber-200 p-5 rounded-xl text-gray-800 leading-relaxed text-sm sm:text-base markdown-content">${formattedText}</div>`;
+            } catch (error) {
+                aiNavResult.innerHTML = '<div class="text-red-500 bg-red-50 p-4 rounded-lg text-center font-medium">抱歉，AI 導航暫時無法連線，請稍後再試。</div>';
+            } finally {
+                // 恢復初始狀態
+                aiNavInput.disabled = false;
+                aiNavBtn.disabled = false;
+                aiNavBtnText.classList.remove('hidden');
+                aiNavSpinner.classList.add('hidden');
+                aiNavInput.focus();
+            }
+        };
+
+        // 點擊 Modal 外部區域關閉
+        aiNavModal.addEventListener('mousedown', (e) => {
+            if (e.target === aiNavModal) toggleAiNavModal();
+        });
+
+        // 監聽 Enter 鍵執行導航
+        aiNavInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') generateAiLearningMap();
+        });
+
+        // 初始渲染
+        renderResources();
+        renderFAQs();
+
+    </script>
+</body>
+</html>
